@@ -30,3 +30,18 @@ func TestCovering(t *testing.T) {
 		t.Error("Value within covering set not correct")
 	}
 }
+
+func TestMultiple(t *testing.T) {
+	ip := New()
+	ip.AddByString("0.0.0.0/0", 0)
+	ip.AddByString("141.212.120.0/24", 3)
+	if val, found, _ := ip.GetByString("1.2.3.4"); !found {
+		t.Error("Values within covering value not found.")
+	} else if val != 0 {
+		t.Error("Value within covering set not correct")
+	}
+	if val, _, _ := ip.GetByString("141.212.120.15"); val != 3 {
+		t.Error("Value within subset not correct")
+	}
+
+}
