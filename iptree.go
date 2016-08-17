@@ -22,6 +22,8 @@ func New() *IPTree {
 }
 
 func (i *IPTree) Add(cidr *net.IPNet, v int) error {
+	_, size := cidr.Mask.Size()
+	i.R.Insert(ipToUint(cidr.IP), size, v)
 	return nil
 }
 
