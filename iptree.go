@@ -22,8 +22,8 @@ func New() *IPTree {
 }
 
 func (i *IPTree) Add(cidr *net.IPNet, v int) error {
-	_, size := cidr.Mask.Size()
-	i.R.Insert(ipToUint(cidr.IP), size, v)
+	size, _ := cidr.Mask.Size()
+	i.R.Insert(ipToUint(cidr.IP.To4()), size, v)
 	return nil
 }
 
@@ -35,15 +35,18 @@ func (i *IPTree) AddByString(ipcidr string, v int) error {
 	return i.Add(ipnet, v)
 }
 
-func (i *IPTree) Get(ip net.IP) (int, error) {
-	val := i.R.Find(ipToUint(ip), 32).Value
-	return val.(int), nil
+func (i *IPTree) Get(ip net.IP) (int, bool, error) {
+	val := i.R.Find(ipToUint(ip.To4()), 32)
+	if val == nil {
+		return 0, false, nil
+	}
+	return val.Value.(int), true, nil
 }
 
-func (i *IPTree) GetByString(ipstr string) (int, error) {
+func (i *IPTree) GetByString(ipstr string) (int, bool, error) {
 	ip := net.ParseIP(ipstr)
 	if ip == nil {
-		return 0, errors.New("invalid IP address")
+		return 0, false, errors.New("invalid IP address")
 	}
 	return i.Get(ip)
 }
