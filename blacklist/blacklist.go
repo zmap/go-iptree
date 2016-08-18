@@ -23,7 +23,7 @@ func (b *Blacklist) AddEntry(cidr string) error {
 	return b.T.AddByString(cidr, 1)
 }
 
-func (b *Blacklist) ParseFromFile(path string, v int) error {
+func (b *Blacklist) ParseFromFile(path string) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return err
