@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/zmap/iptree/iptree"
+	"github.com/zmap/go-iptree/iptree"
 )
 
 type Blacklist struct {
@@ -19,11 +19,11 @@ func New() *Blacklist {
 	return t
 }
 
-func (i *IPTree) AddEntry(cidr string) error {
-	return i.T.AddByString(cidr, 1)
+func (b *Blacklist) AddEntry(cidr string) error {
+	return b.T.AddByString(cidr, 1)
 }
 
-func (i *IPTree) ParseFromFile(path string, v int) error {
+func (b *Blacklist) ParseFromFile(path string, v int) error {
 	file, err := os.Open(path)
 	if err != nil {
 		return err
@@ -32,21 +32,22 @@ func (i *IPTree) ParseFromFile(path string, v int) error {
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
 		words := strings.Fields(scanner.Text())
-		i.AddEntry(words[0])
+		b.AddEntry(words[0])
 	}
 	if err := scanner.Err(); err != nil {
 		return err
 	}
+	return nil
 }
 
-func (i *IPTree) IsBlacklisted(ip string) (bool, error) {
-	r, _, err := i.GetByString(ip)
+func (b *Blacklist) IsBlacklisted(ip string) (bool, error) {
+	r, _, err := b.T.GetByString(ip)
 	if err != nil {
 		return false, err
 	}
 	if r == 0 {
-		return false
+		return false, nil
 	} else {
-		return true
+		return true, nil
 	}
 }
