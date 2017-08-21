@@ -59,7 +59,7 @@ func (b *Blacklist) IsBlacklisted(ip string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if r == 0 {
+	if r.(int) == 0 {
 		return false, nil
 	} else {
 		return true, nil
