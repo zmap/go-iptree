@@ -59,3 +59,16 @@ func TestMultiple(t *testing.T) {
 	}
 
 }
+
+func TestFailingSubnet(t *testing.T) {
+	ip := New()
+	ip.AddByString("115.254.0.0/17", 3)
+	ip.AddByString("115.254.0.0/22", 1)
+	if val, _, _ := ip.GetByString("115.254.115.198"); val.(int) != 3 {
+		t.Error("Value within subset not correct")
+	}
+	if val, _, _ := ip.GetByString("115.254.0.198"); val.(int) != 1 {
+		t.Error("Value within subset not correct")
+	}
+
+}

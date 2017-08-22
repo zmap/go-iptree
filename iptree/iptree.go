@@ -15,14 +15,13 @@
 package iptree
 
 import (
-	"errors"
 	"net"
 
-	"github.com/miekg/bitradix"
+	"github.com/asergeyev/nradix"
 )
 
 type IPTree struct {
-	R *bitradix.Radix32
+	R *nradix.Tree
 }
 
 func ipToUint(ip net.IP) uint32 {
@@ -31,36 +30,32 @@ func ipToUint(ip net.IP) uint32 {
 
 func New() *IPTree {
 	t := new(IPTree)
-	t.R = bitradix.New32()
+	t.R = nradix.NewTree(0)
 	return t
 }
 
 func (i *IPTree) Add(cidr *net.IPNet, v interface{}) error {
-	size, _ := cidr.Mask.Size()
-	i.R.Insert(ipToUint(cidr.IP.To4()), size, v)
-	return nil
+	return i.R.AddCIDR(cidr.String(), v)
 }
 
 func (i *IPTree) AddByString(ipcidr string, v interface{}) error {
-	_, ipnet, err := net.ParseCIDR(ipcidr)
-	if err != nil {
-		return errors.New("invalid CIDR block")
-	}
-	return i.Add(ipnet, v)
+	return i.R.AddCIDR(ipcidr, v)
 }
 
 func (i *IPTree) Get(ip net.IP) (interface{}, bool, error) {
-	val := i.R.Find(ipToUint(ip.To4()), 32)
-	if val == nil {
-		return 0, false, nil
+	v, err := i.R.FindCIDR(ip.String())
+	if v != nil {
+		return v, true, err
+	} else {
+		return v, false, err
 	}
-	return val.Value, true, nil
 }
 
 func (i *IPTree) GetByString(ipstr string) (interface{}, bool, error) {
-	ip := net.ParseIP(ipstr)
-	if ip == nil {
-		return 0, false, errors.New("invalid IP address")
+	v, err := i.R.FindCIDR(ipstr)
+	if v != nil {
+		return v, true, err
+	} else {
+		return v, false, err
 	}
-	return i.Get(ip)
 }
