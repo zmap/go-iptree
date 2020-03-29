@@ -10,7 +10,7 @@ Install
 
 go-iptree can be used by including:
 
-	import "github.com/zmap/go-iptree"
+	import "github.com/zmap/go-iptree/iptree"
 
 
 Usage
