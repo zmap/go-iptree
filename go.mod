@@ -1,4 +1,4 @@
-module github.com/zmap/iptree
+module github.com/zmap/go-iptree
 
 go 1.14
 
