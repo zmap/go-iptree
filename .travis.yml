@@ -1,14 +1,7 @@
 language: go
 go:
-  - 1.5.2
-  - 1.7.4
+  - 1.13
 install:
   - go get ./...
-  - go get -t ./...
 script:
   - go test -v ./...
-notifications:
-  email:
-  - zmap-devel@umich.edu
-  slack:
-    secure: fVer5N2N/LCFbOJY/4lqjnfPT1Wn6LEh9U6s/HmTIRtBOjmfziAf/MyVtfOk+1cNiCFuwydNrvxNHE2SMt0gU8N0OuCIwR/pU+F3Cgy9FcTyKD+dKAwT7jPJAJc2tDJs3GPXxhEfBKPq+VDq77jqrL1KWjdw0/a4UCou1FGP3D4jw9DnyE+G3qAUjNjKQXlprE+p0xG8NKERialghoem7/b3nKY3Drb2JsSlAmF8lrld/e8GQEudgTtpFTJm79NmaOjiUfTNQCpSV9L/kuGScuY5OSq20g1Pkw/ZgAgwcuMfcUbjd/aydFatMA7EKcwFLM8u+fSxGyS352HfmRxXNwvQF15dTueTzJOwSae2RwOtYKYjN5pcDLbZ5F/jezSTuC90s9MRZ/KY0jJa55g6AOVe2uFXTZtXtxn8jwWnLR0jgkPF6r6O0wb3Rkw2Jozj8ML07ddgT2UPFo1xlJGQ0DRGgMkIGHnUOloGo67yDq1qEQZox4RHmcWKqBF5131eZoAy9IklYDT0rAE2hBbYYjc6opB3Z3kEIekBUwt6qsb0A2UIWp0GKsy5/OuB8DAIdg/hvhFltVW7CDiQ5v46hF2erOUXdwJSrUPff+7yoUGYxGxtcXus+8zap81icEmwCmel2EFuUw+oxazQJ9njrEV27KQVps9LstsdmeXvBNw=
