@@ -14,7 +14,12 @@
 
 package iptree
 
-import "testing"
+import (
+	"fmt"
+	"math/rand"
+	"testing"
+	"time"
+)
 
 func TestCreate(t *testing.T) {
 	i := New()
@@ -71,4 +76,96 @@ func TestFailingSubnet(t *testing.T) {
 		t.Error("Value within subset not correct")
 	}
 
+}
+
+// randNumber returns a random integer between 1 and maxIP
+func randNumber(maxIP int) int {
+	return rand.Intn(maxIP-1) + 1
+}
+
+// benchmarkLookup is a crude iptree benchmark tool
+// 1. Generates an iptree of IPs from 1.1.1.1 -> maxIP.maxIP.maxIP.maxIP
+// 2. Generates a big list of random IPs to lookup.  Range of each octet is 1-maxIP
+// 3. Resets the benchmark timer, so the setup step 1-2 don't count in the benchmark
+// 4. Performs the lookups
+// TODO - This is a pretty crude test.  Probably should use maps.
+func benchmarkLookup(debugLevel int, maxIP int, lookups int, b *testing.B) {
+
+	if debugLevel > 100 {
+		fmt.Println("benchmarkLookup\tmaxIP:", maxIP, "\tlookups:", lookups)
+	}
+
+	var startMap = map[string]int{
+		"a": 1,
+		"b": 1,
+		"c": 1,
+		"d": 1,
+	}
+
+	var endMap = map[string]int{
+		"a": maxIP,
+		"b": maxIP,
+		"c": maxIP,
+		"d": maxIP,
+	}
+
+	var i int = 0
+	ip := New()
+	for a := startMap["a"]; a < endMap["a"]; a++ {
+		for b := startMap["b"]; b < endMap["b"]; b++ {
+			for c := startMap["c"]; c < endMap["c"]; c++ {
+				for d := startMap["d"]; d < endMap["d"]; d++ {
+					ipString := fmt.Sprintf("%d.%d.%d.%d/32", a, b, c, d)
+					ipLabel := fmt.Sprintf("a=%d.b=%d.c=%d.d=%d", a, b, c, d)
+					ip.AddByString(ipString, ipLabel)
+					if debugLevel > 1000 {
+						fmt.Println("i:", i, "\tipString:", ipString, "\tipLabel:", ipLabel)
+					}
+					i++
+				}
+			}
+		}
+	}
+	if debugLevel > 10 {
+		fmt.Println("ip trie loaded with:", i)
+	}
+
+	var lookupIPs = make([]string, lookups)
+	var lookupLabels = make([]string, lookups)
+
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < lookups; i++ {
+		a := randNumber(maxIP)
+		b := randNumber(maxIP)
+		c := randNumber(maxIP)
+		d := randNumber(maxIP)
+		ipString := fmt.Sprintf("%d.%d.%d.%d", a, b, c, d)
+		ipLabel := fmt.Sprintf("a=%d.b=%d.c=%d.d=%d", a, b, c, d)
+		lookupIPs[i] = ipString
+		lookupLabels[i] = ipLabel
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < lookups; i++ {
+		if val, _, _ := ip.GetByString(lookupIPs[i]); val != lookupLabels[i] {
+			b.Error(i, "Test failed\texpected:", lookupLabels[i], "\tgot:", val)
+		}
+	}
+
+}
+
+// BenchmarkLookupA 1,000 lookups
+func BenchmarkLookupA(b *testing.B) {
+	benchmarkLookup(111, 30, 1e+3, b)
+}
+
+// BenchmarkLookupA 1,000,000 lookups
+func BenchmarkLookupB(b *testing.B) {
+	benchmarkLookup(111, 30, 1e+6, b)
+}
+
+// BenchmarkLookupA 10,000,000 lookups
+func BenchmarkLookupC(b *testing.B) {
+	benchmarkLookup(111, 30, 1e+7, b)
 }
