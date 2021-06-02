@@ -37,7 +37,7 @@ func TestExactValues(t *testing.T) {
 
 func TestDelete(t *testing.T) {
 	ip := New()
-	ip.AddByString("1.2.3.4/32", 1)
+	ip.AddByString("1.2.3.4/24", 1)
 	ip.AddByString("1.2.3.5/32", 2)
 	if val, _, _ := ip.GetByString("1.2.3.4"); val.(int) != 1 {
 		t.Error("Does not set exact value correctly.")
@@ -45,7 +45,7 @@ func TestDelete(t *testing.T) {
 	if val, _, _ := ip.GetByString("1.2.3.5"); val.(int) != 2 {
 		t.Error("Does not set exact value correctly.")
 	}
-	if err := ip.DeleteByString("1.2.3.4"); err != nil {
+	if err := ip.DeleteByString("1.2.3.4/24"); err != nil {
 		t.Error(err)
 	}
 	if _, found, _ := ip.GetByString("1.2.3.4"); found {
