@@ -40,6 +40,27 @@ func TestExactValues(t *testing.T) {
 	}
 }
 
+func TestDelete(t *testing.T) {
+	ip := New()
+	ip.AddByString("1.2.3.4/24", 1)
+	ip.AddByString("1.2.3.5/32", 2)
+	if val, _, _ := ip.GetByString("1.2.3.4"); val.(int) != 1 {
+		t.Error("Does not set exact value correctly.")
+	}
+	if val, _, _ := ip.GetByString("1.2.3.5"); val.(int) != 2 {
+		t.Error("Does not set exact value correctly.")
+	}
+	if err := ip.DeleteByString("1.2.3.4/24"); err != nil {
+		t.Error(err)
+	}
+	if _, found, _ := ip.GetByString("1.2.3.4"); found {
+		t.Error("Found deleted value.")
+	}
+	if val, _, _ := ip.GetByString("1.2.3.5"); val.(int) != 2 {
+		t.Error("Does not set exact value correctly.")
+	}
+}
+
 func TestCovering(t *testing.T) {
 	ip := New()
 	ip.AddByString("0.0.0.0/0", 1)
@@ -62,7 +83,6 @@ func TestMultiple(t *testing.T) {
 	if val, _, _ := ip.GetByString("141.212.120.15"); val.(int) != 3 {
 		t.Error("Value within subset not correct")
 	}
-
 }
 
 func TestFailingSubnet(t *testing.T) {
@@ -75,7 +95,6 @@ func TestFailingSubnet(t *testing.T) {
 	if val, _, _ := ip.GetByString("115.254.0.198"); val.(int) != 1 {
 		t.Error("Value within subset not correct")
 	}
-
 }
 
 // randNumber returns a random integer between 1 and maxIP

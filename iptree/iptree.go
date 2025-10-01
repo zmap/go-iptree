@@ -59,3 +59,7 @@ func (i *IPTree) GetByString(ipstr string) (interface{}, bool, error) {
 		return v, false, err
 	}
 }
+
+func (i *IPTree) DeleteByString(ipstr string) error {
+	return i.R.DeleteCIDR(ipstr)
+}
