@@ -91,3 +91,21 @@ func TestFailingSubnet(t *testing.T) {
 		t.Error("Value within subset not correct")
 	}
 }
+
+func TestAddAndSetSameSubnet(t *testing.T) {
+	ip := New()
+	if err := ip.AddByString("1.0.0.0/24", 1); err != nil {
+		t.Errorf("error not expected: %v", err)
+	}
+	if err := ip.AddByString("1.0.0.0/24", 2); err == nil {
+		// Add checks first for existance, and will error if found
+		t.Error("error expected")
+	}
+	if err := ip.SetByString("1.0.0.0/24", 3); err != nil {
+		// Set should replace, therefore no error expected
+		t.Errorf("error not expected: %v", err)
+	}
+	if val, _, _ := ip.GetByString("1.0.0.0/24"); val.(int) != 3 {
+		t.Error("Value within subset not correct. Expected 3, got ", val)
+	}
+}
