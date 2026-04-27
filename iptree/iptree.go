@@ -42,6 +42,14 @@ func (i *IPTree) AddByString(ipcidr string, v interface{}) error {
 	return i.R.AddCIDR(ipcidr, v)
 }
 
+func (i *IPTree) Set(cidr *net.IPNet, v interface{}) error {
+	return i.R.SetCIDR(cidr.String(), v)
+}
+
+func (i *IPTree) SetByString(ipcidr string, v interface{}) error {
+	return i.R.SetCIDR(ipcidr, v)
+}
+
 func (i *IPTree) Get(ip net.IP) (interface{}, bool, error) {
 	v, err := i.R.FindCIDR(ip.String())
 	if v != nil {
